@@ -1,0 +1,23 @@
+{
+  "name": "fetch_hiring_challenge",
+  "version": "1.0.0",
+  "description": "api endpoints for adding, subtracting and getting point balance of a user",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Pratik-Sanghavi/Fetch_Backend_Challenge.git"
+  },
+  "author": "Pratik Sanghavi",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Pratik-Sanghavi/Fetch_Backend_Challenge/issues"
+  },
+  "homepage": "https://github.com/Pratik-Sanghavi/Fetch_Backend_Challenge#readme",
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6"
+  }
+}
