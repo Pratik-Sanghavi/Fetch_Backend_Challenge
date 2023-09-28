@@ -40,33 +40,60 @@ const redeem_points = async (req, res) => {
     // First check if the total points is greater than the requested redemption amount
     let {points: target_points} = req.body;
     try{
-        const sql1 = `
+        const sql_sum = `
             SELECT SUM(points) as points
             FROM Points
         `
-        const rows = await query_database(sql1);
+        const rows = await query_database(sql_sum);
         if(!rows||rows.length===0){
             res.status(400).json({message: 'user does not have enough points'});
+            return;
         }
         const total_points = rows[0].points;
         if(!total_points||total_points<target_points){
             res.status(400).json({message: 'user does not have enough points'});
+            return;
         }
-        const sql2 = `
-            SELECT id, payer, points
-            FROM Points
-            WHERE points>0
+        
+        const sql_shortlist = `
+            WITH CumulativePoints AS (
+                SELECT
+                    *,
+                    SUM(points) OVER (ORDER BY timestamp) AS cum_points
+                FROM Points
+            )
+            SELECT * FROM (
+                SELECT 
+                    id, 
+                    payer, 
+                    points,
+                    timestamp
+                FROM CumulativePoints
+                WHERE cum_points<=? AND points>0
+                ORDER BY timestamp
+            ) AS Subquery1
+            UNION
+            SELECT * FROM (
+                SELECT 
+                    id, 
+                    payer, 
+                    points,
+                    timestamp
+                FROM CumulativePoints
+                WHERE cum_points>=? AND points>0
+                ORDER BY timestamp
+                LIMIT 1
+            ) AS Subquery2
             ORDER BY timestamp;
         `;
-        const all_rows = await query_database(sql2);
+        const shortlist_rows = await query_database(sql_shortlist, [target_points, target_points]);
+
         let answer = {};
-        const updated_rows = all_rows.map(row => {
-            if(target_points<=0) return row;
+        const updated_rows = shortlist_rows.map(row => {
+            if(target_points<=0||row.points<=0) return row;
             const deduct_points = Math.min(target_points, row.points);
-            console.log(row.points, target_points, deduct_points);
             row.points -= deduct_points;
             target_points -= deduct_points;
-            console.log(row.points, target_points);
             if(row.payer in answer){
                 answer[row.payer]+=-(deduct_points);
             }else{
@@ -74,7 +101,6 @@ const redeem_points = async (req, res) => {
             }
             return row;
         });
-        console.log(answer);
         updated_rows.forEach(async (row) => {
             const update_row = `
                 UPDATE Points
@@ -84,8 +110,10 @@ const redeem_points = async (req, res) => {
             const updation = await update_database(update_row, [row.points, row.id]);
         });
         res.status(200).json(answer);
+        return;
     } catch(error) {
         res.status(500).json({error:error.message});
+        return;
     }
 }
 
