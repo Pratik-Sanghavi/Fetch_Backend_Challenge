@@ -1,0 +1,45 @@
+Answer the following questions
+
+Why did you choose the tools, libraries, and language you used for the coding exercise?
+Tools:
+1. VSCode: For development.
+2. Postman: For testing
+
+Libraries and Frameworks:
+1. Express: Framework to create the backend for serving the RESTful APIs
+2. SQLite3: For creating and interacting with the database
+
+Language:
+JavaScript mostly. Some amount of SQL for interacting with the database. Markdown for the README file. And english for comments and communicating ideas!
+
+At the beginning I had two choices - I could use Python frameworks/libraries like Flask, Django, FastAPI or Javascript frameworks like express.js. Why choose express.js then? Well for one its much faster. And its more recent in my memory - meaning I'm faster to develop it. Developer time is more expensive than compute time!
+
+I chose SQLite because its perfectly suited for use-cases like these. Its lightweight, can manage low to medium HTTP requests, and most of all easy to get up and running.
+
+
+What are the advantages and disadvantages of your solution?
+
+Advantages
+
+1. Fast and easy to get up and running
+2. Model-Controller pattern makes it easy to collaborate, test, scale and organises code in a semantic way
+
+Disadvantages/Limitations
+1. No type checking (can be done with TypeScript)
+2. Limited data validation
+3. No authentication/authorization
+4. Non-scalable database
+5. No rate limiting 
+6. No cross origin resource sharing (can be easily added)
+
+What has been a favorite school/personal project thus far? What about it that challenged you?
+
+I have worked on quite a few of these now. A personal favourite has to be the student information online portal I made for my violin teacher. Why? Simply because I got to use my skills to make a meaningful impact on someone I deeply admire. My learnings from these:
+
+1. Collect user requirements before starting: Can't emphasise this enough. At work, my manager would delegate tasks and things appeared so much coherent. While working alone, its important to start from the first principles. Ask the right questions, work on translating the answers into achievable tasks, plan the timeline, adhere to a budget - it can get very hard very fast. No wonder we always work in teams! Apes together strong.
+
+2. Frontend isn't so hard: Okay. I find it immensely hard to get inspiration for good responsive frontend. Its subjective, not well-defined and depends on the user platform(!!). But I found there's quite a few libraries that make it bearable.
+
+3. Keep it real: Its very easy to fall into a trap where you keep iterating on a feature which may not be that useful. Communicate, use feedback and work. Not every user wants to go back to the blue button after suggesting a green one.
+
+4. Learn like you'll live forever: This one isn't news to me. Its just easy to gravitate to your comfort zone. Learn relevant things and keep improving your workflows. Its just computer science. The greatest cost of failing is some coffee, electricity and your fragile ego!
