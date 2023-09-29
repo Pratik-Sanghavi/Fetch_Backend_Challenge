@@ -19,10 +19,10 @@ const handle_negative_points = async(req, res) => {
             FROM Points
             WHERE payer = ?
         `
-        const row = query_database(sql_check, [payer]);
-        if(!row||row.points<points){
+        const row = await query_database(sql_check, [payer]);
+        if(!row||row[0].points<target_points){
             res.status(400).json({
-                error: `The payer ${payer} has fewer than ${points} points`
+                error: `The payer ${payer} has fewer than ${target_points} points`
             })
             return;
         }
