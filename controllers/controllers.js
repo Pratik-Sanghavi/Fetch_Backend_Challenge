@@ -8,12 +8,94 @@ const {
 ################### ADD POINTS CONTROLLERS ###################
 */
 
+const handle_negative_points = async(req, res) => {
+    try{
+        let {payer, points} = req.body;
+        target_points = -(points);
+        // Check if payer has enough points
+        sql_check = `
+            SELECT
+                SUM(points) as points
+            FROM Points
+            WHERE payer = ?
+        `
+        const row = query_database(sql_check, [payer]);
+        if(!row||row.points<points){
+            res.status(400).json({
+                error: `The payer ${payer} has fewer than ${points} points`
+            })
+            return;
+        }
+        // If the payer has more points then go and subtract the points from them chronologically
+        const sql_shortlist = `
+            WITH CumulativePoints AS (
+                SELECT
+                    *,
+                    SUM(points) OVER (ORDER BY timestamp) AS cum_points
+                FROM Points
+                WHERE payer = ?
+            )
+            SELECT * FROM (
+                SELECT 
+                    id, 
+                    payer, 
+                    points,
+                    timestamp
+                FROM CumulativePoints
+                WHERE cum_points<=? AND points>0
+                ORDER BY timestamp
+            ) AS Subquery1
+            UNION
+            SELECT * FROM (
+                SELECT 
+                    id, 
+                    payer, 
+                    points,
+                    timestamp
+                FROM CumulativePoints
+                WHERE cum_points>=? AND points>0
+                ORDER BY timestamp
+                LIMIT 1
+            ) AS Subquery2
+            ORDER BY timestamp;
+        `;
+        const shortlist_rows = await query_database(sql_shortlist, [payer, target_points, target_points]);
+
+        const updated_rows = shortlist_rows.map(row => {
+            if(target_points<=0||row.points<=0) return row;
+            const deduct_points = Math.min(target_points, row.points);
+            row.points -= deduct_points;
+            target_points -= deduct_points;
+            return row;
+        });
+        updated_rows.forEach(async (row) => {
+            const update_row = `
+                UPDATE Points
+                set points = ?
+                WHERE id = ?;
+            `
+            const updation = await update_database(update_row, [row.points, row.id]);
+        });
+        res.status(200).send();
+        return;
+    } catch(err){
+        res.status(500).json({
+            error: err.message
+        });
+        return;
+    }
+}
+
 const add_points = async (req, res) => {
     const {payer, points, timestamp} = req.body;
-    if(!payer||!points||!timestamp||points<=0){
+    if(!payer||!points||!timestamp){
         res.status(400).json({
-            error: 'Missing data fields or invalid input for points'
+            error: 'Missing data fields'
         });
+        return;
+    }
+    if(points<0){
+        const ret = await handle_negative_points(req, res);
         return;
     }
     try{
