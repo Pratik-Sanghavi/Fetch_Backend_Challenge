@@ -10,10 +10,11 @@ const {
 
 const add_points = async (req, res) => {
     const {payer, points, timestamp} = req.body;
-    if(!payer||!points||!timestamp){
-        return res.status(400).json({
-            error: 'Missing data fields'
+    if(!payer||!points||!timestamp||points<=0){
+        res.status(400).json({
+            error: 'Missing data fields or invalid input for points'
         });
+        return;
     }
     try{
         const sql = `INSERT INTO Points (
